@@ -197,14 +197,17 @@ public class CloudPubSubSourceConnector extends SourceConnector {
   @VisibleForTesting
   public void verifySubscription(String cpsProject, String cpsSubscription) {
     try {
-      SubscriberFutureStub stub = SubscriberGrpc.newFutureStub(ConnectorUtils.getChannel());
-      GetSubscriptionRequest request =
-          GetSubscriptionRequest.newBuilder()
-              .setSubscription(
-                  String.format(
-                      ConnectorUtils.CPS_SUBSCRIPTION_FORMAT, cpsProject, cpsSubscription))
-              .build();
-      stub.getSubscription(request).get();
+    	String verifySubscription = System.getenv("VIZIX_PUBSUB_VERIFY_SUBSCRIPTION_ENABLE");
+		if(verifySubscription==null || "true".equals(verifySubscription)) {
+    		SubscriberFutureStub stub = SubscriberGrpc.newFutureStub(ConnectorUtils.getChannel());
+    	      GetSubscriptionRequest request =
+    	          GetSubscriptionRequest.newBuilder()
+    	              .setSubscription(
+    	                  String.format(
+    	                      ConnectorUtils.CPS_SUBSCRIPTION_FORMAT, cpsProject, cpsSubscription))
+    	              .build();
+    	      stub.getSubscription(request).get();
+    	}
     } catch (Exception e) {
       throw new ConnectException(
           "Error verifying the subscription " + cpsSubscription + " for project " + cpsProject, e);
